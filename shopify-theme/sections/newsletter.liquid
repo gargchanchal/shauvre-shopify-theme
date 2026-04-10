@@ -1,0 +1,103 @@
+{% comment %}
+  Newsletter Section - Shopify Theme
+  Integrates with Shopify customer accounts
+{% endcomment %}
+
+<section class="py-20 bg-brand-purple text-white">
+  <div class="container mx-auto px-4">
+    <div class="max-w-3xl mx-auto text-center">
+      <!-- Icon -->
+      <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
+        <svg class="w-8 h-8 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+      </div>
+
+      <!-- Content -->
+      <h2 class="text-3xl md:text-4xl font-serif font-bold mb-4">
+        {{ section.settings.newsletter_title }}
+      </h2>
+      <p class="text-white/80 text-lg mb-8">
+        {{ section.settings.newsletter_description }}
+      </p>
+
+      <!-- Shopify Newsletter Form -->
+      {% form 'customer', class: 'max-w-md mx-auto' %}
+        {% if form.posted_successfully? %}
+          <div class="bg-green-500/20 border border-green-500/50 text-white px-4 py-3 rounded mb-4">
+            <p class="text-sm">{{ section.settings.success_message }}</p>
+          </div>
+        {% endif %}
+
+        {% if form.errors %}
+          <div class="bg-red-500/20 border border-red-500/50 text-white px-4 py-3 rounded mb-4">
+            <p class="text-sm">{{ form.errors | default_errors }}</p>
+          </div>
+        {% endif %}
+
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="flex-1 relative">
+            <input
+              type="email"
+              name="contact[email]"
+              id="newsletter-email"
+              placeholder="Enter your email"
+              required
+              class="h-12 w-full bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:bg-white/15 focus:border-brand-gold transition-colors px-4 rounded"
+            >
+          </div>
+          <button
+            type="submit"
+            class="h-12 bg-brand-gold hover:bg-[#d08419] text-white px-8 font-medium transition-all duration-300 hover:shadow-lg rounded"
+          >
+            Subscribe
+          </button>
+        </div>
+      {% endform %}
+
+      <!-- Privacy Note -->
+      <p class="text-white/60 text-sm mt-6">
+        {{ section.settings.privacy_text }}
+      </p>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "settings": [
+    {
+      "type": "text",
+      "id": "newsletter_title",
+      "label": "Newsletter Title",
+      "default": "Would you like to hear more from Shauvre?"
+    },
+    {
+      "type": "textarea",
+      "id": "newsletter_description",
+      "label": "Newsletter Description",
+      "default": "Subscribe to receive our monthly newsletter with collection updates, seasonal sales and exclusive promotions."
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success Message",
+      "default": "Thank you for subscribing!"
+    },
+    {
+      "type": "text",
+      "id": "privacy_text",
+      "label": "Privacy Text",
+      "default": "We respect your privacy. Unsubscribe at any time."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter"
+    }
+  ]
+}
+{% endschema %}

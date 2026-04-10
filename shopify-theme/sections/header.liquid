@@ -1,0 +1,135 @@
+{% comment %}
+  Header Section - Shopify Theme
+  Includes navigation, logo, search, and cart
+{% endcomment %}
+
+<header class="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-gray-200">
+  <!-- Announcement Bar -->
+  <div class="bg-brand-purple text-white text-center py-2 px-4">
+    <p class="text-sm font-medium">
+      {% if section.settings.announcement_text != blank %}
+        {{ section.settings.announcement_text }}
+      {% else %}
+        THE SUMMER COLLECTION HAS ARRIVED - SHOP NEW ARRIVALS NOW
+      {% endif %}
+    </p>
+  </div>
+
+  <!-- Main Header -->
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between h-20 lg:h-24">
+      
+      <!-- Mobile Menu Button -->
+      <button 
+        id="mobile-menu-toggle"
+        class="lg:hidden p-2 hover:bg-gray-100 rounded-md transition-colors"
+        aria-label="Toggle menu"
+      >
+        <svg class="menu-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <svg class="close-icon hidden w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <!-- Logo -->
+      <div class="flex-1 lg:flex-none text-center lg:text-left">
+        <a href="/" class="inline-block">
+          {% if section.settings.logo != blank %}
+            <img 
+              src="{{ section.settings.logo | img_url: '200x' }}" 
+              alt="{{ shop.name }}"
+              class="h-16 lg:h-20 w-auto object-contain"
+              loading="lazy"
+            >
+          {% else %}
+            <img 
+              src="https://customer-assets.emergentagent.com/job_boutique-launch/artifacts/u4okpnuu_LOGO%20SR%20%282%29%281%29.png"
+              alt="{{ shop.name }}"
+              class="h-16 lg:h-20 w-auto object-contain"
+              loading="lazy"
+            >
+          {% endif %}
+        </a>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden lg:flex items-center space-x-8 flex-1 justify-center">
+        {% for link in linklists[section.settings.menu].links %}
+          <a 
+            href="{{ link.url }}" 
+            class="text-sm font-medium text-gray-700 hover:text-brand-purple transition-colors"
+          >
+            {{ link.title }}
+          </a>
+        {% endfor %}
+      </nav>
+
+      <!-- Icons -->
+      <div class="flex items-center space-x-4">
+        <!-- Search -->
+        <a href="/search" class="p-2 hover:bg-gray-100 rounded-md transition-colors" aria-label="Search">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </a>
+        
+        <!-- Cart -->
+        <a href="/cart" class="p-2 hover:bg-gray-100 rounded-md transition-colors relative" aria-label="Shopping bag">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+          </svg>
+          {% if cart.item_count > 0 %}
+            <span class="absolute -top-1 -right-1 bg-brand-gold text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {{ cart.item_count }}
+            </span>
+          {% else %}
+            <span class="absolute -top-1 -right-1 bg-brand-gold text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              0
+            </span>
+          {% endif %}
+        </a>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <nav id="mobile-menu" class="hidden lg:hidden py-4 border-t border-gray-200">
+      <div class="flex flex-col space-y-4">
+        {% for link in linklists[section.settings.menu].links %}
+          <a
+            href="{{ link.url }}"
+            class="text-sm font-medium text-gray-700 hover:text-brand-purple transition-colors"
+          >
+            {{ link.title }}
+          </a>
+        {% endfor %}
+      </div>
+    </nav>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "text",
+      "id": "announcement_text",
+      "label": "Announcement Text",
+      "default": "THE SUMMER COLLECTION HAS ARRIVED - SHOP NEW ARRIVALS NOW"
+    }
+  ]
+}
+{% endschema %}

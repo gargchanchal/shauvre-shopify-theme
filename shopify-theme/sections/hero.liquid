@@ -1,0 +1,97 @@
+{% comment %}
+  Hero Section - Shopify Theme
+  Full-screen hero banner with CTA
+{% endcomment %}
+
+<section class="relative h-[70vh] lg:h-[85vh] overflow-hidden">
+  <!-- Background Image -->
+  <div class="absolute inset-0">
+    {% if section.settings.hero_image != blank %}
+      <img
+        src="{{ section.settings.hero_image | img_url: '2000x' }}"
+        alt="{{ section.settings.hero_title }}"
+        class="w-full h-full object-cover object-center"
+        loading="eager"
+      >
+    {% else %}
+      <img
+        src="https://images.unsplash.com/photo-1559034750-cdab70a66b8e"
+        alt="Hero background"
+        class="w-full h-full object-cover object-center"
+        loading="eager"
+      >
+    {% endif %}
+    <div class="absolute inset-0 bg-gradient-to-r from-black/40 to-black/20"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="relative h-full container mx-auto px-4 flex items-center">
+    <div class="max-w-2xl text-white">
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-4 leading-tight">
+        {{ section.settings.hero_title }}
+      </h1>
+      <p class="text-lg md:text-xl mb-8 text-white/90">
+        {{ section.settings.hero_subtitle }}
+      </p>
+      {% if section.settings.hero_button_text != blank %}
+        <a 
+          href="{{ section.settings.hero_button_link }}"
+          class="inline-flex items-center bg-brand-gold hover:bg-[#d08419] text-white px-8 py-4 text-base font-medium rounded transition-all duration-300 hover:shadow-lg group"
+        >
+          {{ section.settings.hero_button_text }}
+          <svg class="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Scroll Indicator -->
+  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+    <div class="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
+      <div class="w-1 h-2 bg-white/50 rounded-full"></div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero Section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero Background Image"
+    },
+    {
+      "type": "text",
+      "id": "hero_title",
+      "label": "Hero Title",
+      "default": "The Summer Collection Has Arrived"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subtitle",
+      "label": "Hero Subtitle",
+      "default": "Discover timeless elegance and modern sophistication"
+    },
+    {
+      "type": "text",
+      "id": "hero_button_text",
+      "label": "Button Text",
+      "default": "Shop New Arrivals"
+    },
+    {
+      "type": "url",
+      "id": "hero_button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Section"
+    }
+  ]
+}
+{% endschema %}

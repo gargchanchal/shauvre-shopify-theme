@@ -1,0 +1,165 @@
+{% comment %}
+  About Section - Shopify Theme
+{% endcomment %}
+
+<section id="about" class="py-20 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <!-- Image -->
+      <div class="order-2 lg:order-1">
+        <div class="relative rounded-lg overflow-hidden aspect-[4/5]">
+          {% if section.settings.about_image != blank %}
+            <img
+              src="{{ section.settings.about_image | img_url: '800x' }}"
+              alt="{{ section.settings.about_title }}"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            >
+          {% else %}
+            <img
+              src="https://images.unsplash.com/photo-1483985988355-763728e1935b"
+              alt="About us"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            >
+          {% endif %}
+          <div class="absolute inset-0 bg-gradient-to-br from-brand-purple/10 to-transparent"></div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="order-1 lg:order-2 space-y-6">
+        <div>
+          <p class="text-brand-gold font-medium text-sm uppercase tracking-wider mb-3">
+            {{ section.settings.about_eyebrow }}
+          </p>
+          <h2 class="text-3xl md:text-4xl font-serif font-bold text-brand-purple mb-4">
+            {{ section.settings.about_title }}
+          </h2>
+          <p class="text-xl text-gray-700 font-medium mb-6">
+            {{ section.settings.about_subtitle }}
+          </p>
+        </div>
+        
+        <div class="text-gray-600 leading-relaxed text-lg">
+          {{ section.settings.about_description }}
+        </div>
+
+        <!-- Features -->
+        <div class="grid grid-cols-2 gap-6 pt-8">
+          {% for block in section.blocks %}
+            <div class="space-y-2">
+              <div class="w-12 h-12 bg-brand-purple/10 rounded-full flex items-center justify-center mb-3">
+                <span class="text-2xl">{{ block.settings.feature_icon }}</span>
+              </div>
+              <h4 class="font-semibold text-gray-900">{{ block.settings.feature_title }}</h4>
+              <p class="text-sm text-gray-600">{{ block.settings.feature_description }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "About Section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "about_image",
+      "label": "About Image"
+    },
+    {
+      "type": "text",
+      "id": "about_eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Our Story"
+    },
+    {
+      "type": "text",
+      "id": "about_title",
+      "label": "Title",
+      "default": "About Shauvre"
+    },
+    {
+      "type": "text",
+      "id": "about_subtitle",
+      "label": "Subtitle",
+      "default": "Where Elegance Meets Craftsmanship"
+    },
+    {
+      "type": "textarea",
+      "id": "about_description",
+      "label": "Description",
+      "default": "At Shauvre, we believe in creating beautiful luxury pieces that transcend seasons. Our collection features handpicked designs crafted from the finest materials, designed to last and be treasured for years to come."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "feature_icon",
+          "label": "Emoji Icon",
+          "default": "✨"
+        },
+        {
+          "type": "text",
+          "id": "feature_title",
+          "label": "Feature Title",
+          "default": "Premium Quality"
+        },
+        {
+          "type": "text",
+          "id": "feature_description",
+          "label": "Feature Description",
+          "default": "Finest materials, expertly crafted"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "About Section",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "feature_icon": "✨",
+            "feature_title": "Premium Quality",
+            "feature_description": "Finest materials, expertly crafted"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "feature_icon": "🎨",
+            "feature_title": "Timeless Design",
+            "feature_description": "Elegant pieces that last"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "feature_icon": "🌍",
+            "feature_title": "Sustainable",
+            "feature_description": "Responsibly sourced materials"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "feature_icon": "💎",
+            "feature_title": "Exclusive",
+            "feature_description": "Limited edition collections"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
