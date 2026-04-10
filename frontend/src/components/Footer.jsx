@@ -12,7 +12,7 @@ const Footer = () => {
             <img 
               src="https://customer-assets.emergentagent.com/job_boutique-launch/artifacts/u4okpnuu_LOGO%20SR%20%282%29%281%29.png" 
               alt="Shauvre Logo" 
-              className="h-20 w-auto object-contain"
+              className="h-24 lg:h-28 w-auto object-contain"
             />
             <p className="text-gray-600 text-sm leading-relaxed">
               Luxury fashion and timeless elegance. Discover our curated collection of premium clothing and accessories.

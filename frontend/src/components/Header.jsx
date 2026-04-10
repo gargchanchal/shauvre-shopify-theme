@@ -14,7 +14,7 @@ const Header = () => {
 
       {/* Main Header */}
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20 lg:h-24">
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -30,7 +30,7 @@ const Header = () => {
               <img 
                 src="https://customer-assets.emergentagent.com/job_boutique-launch/artifacts/u4okpnuu_LOGO%20SR%20%282%29%281%29.png" 
                 alt="Shauvre Logo" 
-                className="h-14 lg:h-16 w-auto object-contain"
+                className="h-16 lg:h-20 w-auto object-contain"
               />
             </a>
           </div>
