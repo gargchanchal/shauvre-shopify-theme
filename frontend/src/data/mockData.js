@@ -94,13 +94,13 @@ export const heroContent = {
 };
 
 export const aboutContent = {
-  title: "About Shouvre",
+  title: "About Shauvre",
   subtitle: "Where Elegance Meets Craftsmanship",
-  description: "At Shouvre, we believe in creating beautiful luxury pieces that transcend seasons. Our collection features handpicked designs crafted from the finest materials, designed to last and be treasured for years to come. Every piece tells a story of sophistication, quality, and timeless style.",
+  description: "At Shauvre, we believe in creating beautiful luxury pieces that transcend seasons. Our collection features handpicked designs crafted from the finest materials, designed to last and be treasured for years to come. Every piece tells a story of sophistication, quality, and timeless style.",
   image: "https://images.unsplash.com/photo-1483985988355-763728e1935b"
 };
 
 export const newsletterContent = {
-  title: "Would you like to hear more from Shouvre?",
+  title: "Would you like to hear more from Shauvre?",
   subtitle: "Subscribe to receive our monthly newsletter with collection updates, seasonal sales and exclusive promotions."
 };

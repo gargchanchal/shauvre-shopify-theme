@@ -25,7 +25,7 @@ const AboutSection = () => {
                 Our Story
               </p>
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#4C1C5B] mb-4">
-                {aboutContent.title}
+                About Shauvre
               </h2>
               <p className="text-xl text-gray-700 font-medium mb-6">
                 {aboutContent.subtitle}

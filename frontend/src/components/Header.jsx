@@ -26,8 +26,12 @@ const Header = () => {
 
           {/* Logo */}
           <div className="flex-1 lg:flex-none text-center lg:text-left">
-            <a href="/" className="text-2xl font-serif font-bold text-[#4C1C5B]">
-              SHOUVRE
+            <a href="/" className="inline-block">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_boutique-launch/artifacts/u4okpnuu_LOGO%20SR%20%282%29%281%29.png" 
+                alt="Shauvre Logo" 
+                className="h-14 lg:h-16 w-auto object-contain"
+              />
             </a>
           </div>
 

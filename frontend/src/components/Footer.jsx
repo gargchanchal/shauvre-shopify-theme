@@ -9,7 +9,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-4">
-            <h3 className="text-2xl font-serif font-bold text-[#4C1C5B]">SHOUVRE</h3>
+            <img 
+              src="https://customer-assets.emergentagent.com/job_boutique-launch/artifacts/u4okpnuu_LOGO%20SR%20%282%29%281%29.png" 
+              alt="Shauvre Logo" 
+              className="h-20 w-auto object-contain"
+            />
             <p className="text-gray-600 text-sm leading-relaxed">
               Luxury fashion and timeless elegance. Discover our curated collection of premium clothing and accessories.
             </p>
@@ -128,7 +132,7 @@ const Footer = () => {
         <div className="pt-8 border-t border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-600 text-sm">
-              © {new Date().getFullYear()} Shouvre. All rights reserved.
+              © {new Date().getFullYear()} Shauvre. All rights reserved.
             </p>
             <div className="flex space-x-6">
               <a href="#privacy" className="text-gray-600 hover:text-[#4C1C5B] transition-colors text-sm">
