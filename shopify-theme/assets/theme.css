@@ -49,7 +49,37 @@ img {
     background: #E1921D;
 }
 
-/* Form input styles */
+/* Currency selector styles */
+.currency-selector {
+    position: relative;
+}
+
+.currency-form {
+    margin: 0;
+}
+
+#currency-selector {
+    background-image: none;
+    padding-right: 2rem;
+}
+
+#currency-selector::-ms-expand {
+    display: none;
+}
+
+/* Mobile currency selector */
+@media (max-width: 640px) {
+    #currency-selector {
+        font-size: 0.875rem;
+        padding-left: 0.5rem;
+        padding-right: 1.75rem;
+    }
+}
+
+/* Currency selector hover state */
+.currency-selector:hover select {
+    border-color: #4C1C5B;
+}
 input[type="email"],
 input[type="text"],
 input[type="search"],

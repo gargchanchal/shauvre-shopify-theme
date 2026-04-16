@@ -22,6 +22,21 @@
     });
   }
 
+  // Currency Selector
+  const currencySelector = document.getElementById('currency-selector');
+  if (currencySelector) {
+    // Store selected currency in localStorage
+    currencySelector.addEventListener('change', function() {
+      localStorage.setItem('selectedCurrency', this.value);
+    });
+
+    // Load previously selected currency
+    const savedCurrency = localStorage.getItem('selectedCurrency');
+    if (savedCurrency && currencySelector.querySelector(`option[value="${savedCurrency}"]`)) {
+      currencySelector.value = savedCurrency;
+    }
+  }
+
   // Smooth scroll for anchor links
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {

@@ -68,6 +68,33 @@
 
       <!-- Icons -->
       <div class="flex items-center space-x-4">
+        <!-- Currency Selector -->
+        <div class="relative currency-selector">
+          {% form 'currency', class: 'currency-form' %}
+            <label for="currency-selector" class="sr-only">Currency</label>
+            <select 
+              name="currency" 
+              id="currency-selector"
+              class="h-10 px-3 pr-8 bg-white border border-gray-200 rounded-md text-sm font-medium text-gray-700 hover:border-brand-purple focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-colors cursor-pointer appearance-none"
+              onchange="this.form.submit();"
+            >
+              {% for currency in shop.enabled_currencies %}
+                <option 
+                  value="{{ currency.iso_code }}" 
+                  {% if currency == cart.currency %}selected="selected"{% endif %}
+                >
+                  {{ currency.iso_code }} {{ currency.symbol }}
+                </option>
+              {% endfor %}
+            </select>
+            <div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          {% endform %}
+        </div>
+
         <!-- Search -->
         <a href="/search" class="p-2 hover:bg-gray-100 rounded-md transition-colors" aria-label="Search">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
