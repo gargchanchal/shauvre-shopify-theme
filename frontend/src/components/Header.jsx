@@ -1,9 +1,26 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Menu, X, Search } from 'lucide-react';
+import { ShoppingBag, Menu, X, Search, ChevronDown } from 'lucide-react';
 import { Button } from './ui/button';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
+
+  const currencies = [
+    { code: 'USD', symbol: '$', name: 'US Dollar' },
+    { code: 'EUR', symbol: '€', name: 'Euro' },
+    { code: 'GBP', symbol: '£', name: 'British Pound' },
+    { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' },
+    { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
+    { code: 'AED', symbol: 'AED', name: 'UAE Dirham' },
+    { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+  ];
+
+  const handleCurrencyChange = (e) => {
+    setSelectedCurrency(e.target.value);
+    // Store in localStorage for persistence
+    localStorage.setItem('selectedCurrency', e.target.value);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-gray-200">
@@ -53,6 +70,23 @@ const Header = () => {
 
           {/* Icons */}
           <div className="flex items-center space-x-4">
+            {/* Currency Selector */}
+            <div className="relative">
+              <select
+                value={selectedCurrency}
+                onChange={handleCurrencyChange}
+                className="h-10 px-3 pr-8 bg-white border border-gray-200 rounded-md text-sm font-medium text-gray-700 hover:border-[#4C1C5B] focus:border-[#4C1C5B] focus:outline-none focus:ring-2 focus:ring-[#4C1C5B]/20 transition-colors cursor-pointer appearance-none"
+                aria-label="Select currency"
+              >
+                {currencies.map((currency) => (
+                  <option key={currency.code} value={currency.code}>
+                    {currency.code} {currency.symbol}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+            </div>
+
             <button className="p-2 hover:bg-gray-100 rounded-md transition-colors" aria-label="Search">
               <Search size={20} />
             </button>
