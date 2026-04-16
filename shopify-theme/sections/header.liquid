@@ -78,14 +78,25 @@
               class="h-10 px-3 pr-8 bg-white border border-gray-200 rounded-md text-sm font-medium text-gray-700 hover:border-brand-purple focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-colors cursor-pointer appearance-none"
               onchange="this.form.submit();"
             >
-              {% for currency in shop.enabled_currencies %}
-                <option 
-                  value="{{ currency.iso_code }}" 
-                  {% if currency == cart.currency %}selected="selected"{% endif %}
-                >
-                  {{ currency.iso_code }} {{ currency.symbol }}
-                </option>
-              {% endfor %}
+              {% if shop.enabled_currencies.size > 0 %}
+                {% for currency in shop.enabled_currencies %}
+                  <option 
+                    value="{{ currency.iso_code }}" 
+                    {% if currency == cart.currency %}selected="selected"{% endif %}
+                  >
+                    {{ currency.iso_code }} {{ currency.symbol }}
+                  </option>
+                {% endfor %}
+              {% else %}
+                <!-- Fallback currencies if multi-currency not enabled -->
+                <option value="USD" selected>USD $</option>
+                <option value="EUR">EUR €</option>
+                <option value="GBP">GBP £</option>
+                <option value="CAD">CAD C$</option>
+                <option value="AUD">AUD A$</option>
+                <option value="AED">AED</option>
+                <option value="INR">INR ₹</option>
+              {% endif %}
             </select>
             <div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
               <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

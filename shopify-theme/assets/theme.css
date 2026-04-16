@@ -61,10 +61,22 @@ img {
 #currency-selector {
     background-image: none;
     padding-right: 2rem;
+    min-width: 100px;
 }
 
 #currency-selector::-ms-expand {
     display: none;
+}
+
+/* Currency selector hover and focus states */
+.currency-selector:hover select {
+    border-color: #4C1C5B;
+}
+
+#currency-selector:focus {
+    outline: none;
+    border-color: #4C1C5B;
+    box-shadow: 0 0 0 2px rgba(76, 28, 91, 0.2);
 }
 
 /* Mobile currency selector */
@@ -73,12 +85,15 @@ img {
         font-size: 0.875rem;
         padding-left: 0.5rem;
         padding-right: 1.75rem;
+        min-width: 85px;
     }
 }
 
-/* Currency selector hover state */
-.currency-selector:hover select {
-    border-color: #4C1C5B;
+/* Responsive adjustments for header icons */
+@media (max-width: 768px) {
+    .flex.items-center.space-x-4 {
+        gap: 0.5rem;
+    }
 }
 input[type="email"],
 input[type="text"],
