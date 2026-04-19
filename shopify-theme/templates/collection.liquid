@@ -1,0 +1,156 @@
+{% comment %}
+  Collection Template - Shows all products in a collection
+{% endcomment %}
+
+<div class="collection-page py-12 bg-white">
+  <div class="container mx-auto px-6 md:px-12 lg:px-16">
+    
+    <!-- Collection Header -->
+    <div class="text-center mb-12">
+      {% if collection.image %}
+        <div class="mb-8 rounded-lg overflow-hidden max-w-4xl mx-auto">
+          <img 
+            src="{{ collection.image | img_url: '1200x' }}" 
+            alt="{{ collection.title }}"
+            class="w-full h-64 object-cover"
+          >
+        </div>
+      {% endif %}
+      
+      <h1 class="text-4xl md:text-5xl font-serif font-bold text-brand-purple mb-4">
+        {{ collection.title }}
+      </h1>
+      
+      {% if collection.description != blank %}
+        <div class="text-gray-600 max-w-2xl mx-auto text-lg">
+          {{ collection.description }}
+        </div>
+      {% endif %}
+      
+      <p class="text-gray-500 mt-4">
+        {{ collection.products_count }} 
+        {% if collection.products_count == 1 %}product{% else %}products{% endif %}
+      </p>
+    </div>
+
+    <!-- Filter and Sort -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+      <div class="text-gray-600">
+        Showing {{ collection.products.size }} products
+      </div>
+      
+      <div class="flex gap-4">
+        <!-- Sort Dropdown -->
+        <select 
+          onchange="location.href=this.value"
+          class="px-4 py-2 border border-gray-200 rounded-md text-sm hover:border-brand-purple transition-colors"
+        >
+          <option value="{{ collection.url }}">Sort by: Featured</option>
+          <option value="{{ collection.url }}?sort_by=title-ascending">A-Z</option>
+          <option value="{{ collection.url }}?sort_by=title-descending">Z-A</option>
+          <option value="{{ collection.url }}?sort_by=price-ascending">Price: Low to High</option>
+          <option value="{{ collection.url }}?sort_by=price-descending">Price: High to Low</option>
+          <option value="{{ collection.url }}?sort_by=created-descending">Newest</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    {% paginate collection.products by 12 %}
+      {% if collection.products.size > 0 %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {% for product in collection.products %}
+            <div class="product-card group">
+              <a href="{{ product.url }}" class="block">
+                <!-- Product Image -->
+                <div class="relative overflow-hidden rounded-lg mb-4 aspect-[3/4] bg-gray-100">
+                  {% if product.featured_image %}
+                    <img 
+                      src="{{ product.featured_image | img_url: '600x' }}" 
+                      alt="{{ product.title }}"
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    >
+                  {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-gray-400">
+                      No image
+                    </div>
+                  {% endif %}
+                  
+                  <!-- Sale Badge -->
+                  {% if product.compare_at_price > product.price %}
+                    <span class="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                      SALE
+                    </span>
+                  {% endif %}
+                </div>
+
+                <!-- Product Info -->
+                <div class="space-y-2">
+                  <h3 class="text-lg font-semibold text-gray-900 group-hover:text-brand-purple transition-colors">
+                    {{ product.title }}
+                  </h3>
+                  
+                  <!-- Price -->
+                  <div class="flex items-center gap-2">
+                    {% if product.compare_at_price > product.price %}
+                      <span class="text-lg font-bold text-red-600">
+                        {{ product.price | money }}
+                      </span>
+                      <span class="text-sm text-gray-400 line-through">
+                        {{ product.compare_at_price | money }}
+                      </span>
+                    {% else %}
+                      <span class="text-lg font-bold text-gray-900">
+                        {{ product.price | money }}
+                      </span>
+                    {% endif %}
+                  </div>
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if paginate.pages > 1 %}
+          <div class="mt-12 flex justify-center">
+            <nav class="flex items-center gap-2">
+              {% if paginate.previous %}
+                <a href="{{ paginate.previous.url }}" class="px-4 py-2 border border-gray-200 rounded-md hover:border-brand-purple transition-colors">
+                  Previous
+                </a>
+              {% endif %}
+              
+              {% for part in paginate.parts %}
+                {% if part.is_link %}
+                  <a href="{{ part.url }}" class="px-4 py-2 border border-gray-200 rounded-md hover:border-brand-purple transition-colors">
+                    {{ part.title }}
+                  </a>
+                {% else %}
+                  <span class="px-4 py-2 bg-brand-purple text-white rounded-md">
+                    {{ part.title }}
+                  </span>
+                {% endif %}
+              {% endfor %}
+              
+              {% if paginate.next %}
+                <a href="{{ paginate.next.url }}" class="px-4 py-2 border border-gray-200 rounded-md hover:border-brand-purple transition-colors">
+                  Next
+                </a>
+              {% endif %}
+            </nav>
+          </div>
+        {% endif %}
+      {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-20">
+          <p class="text-xl text-gray-600 mb-4">No products in this collection yet.</p>
+          <a href="/collections" class="text-brand-purple hover:text-brand-gold transition-colors">
+            Browse all collections
+          </a>
+        </div>
+      {% endif %}
+    {% endpaginate %}
+  </div>
+</div>

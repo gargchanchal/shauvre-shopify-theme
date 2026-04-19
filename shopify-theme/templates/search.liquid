@@ -1,0 +1,50 @@
+{% comment %}
+  Search Template
+{% endcomment %}
+
+<div class="search-page py-12 bg-white min-h-screen">
+  <div class="container mx-auto px-6 md:px-12 lg:px-16">
+    
+    <h1 class="text-3xl md:text-4xl font-serif font-bold text-brand-purple mb-8">Search</h1>
+    
+    <form action="/search" method="get" class="max-w-2xl mx-auto mb-12">
+      <div class="relative">
+        <input 
+          type="search" 
+          name="q" 
+          value="{{ search.terms | escape }}"
+          placeholder="Search products..."
+          class="w-full px-6 py-4 border-2 border-gray-200 rounded-lg focus:border-brand-purple focus:outline-none"
+        >
+        <button type="submit" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-brand-purple text-white p-3 rounded-md">
+          Search
+        </button>
+      </div>
+    </form>
+
+    {% if search.performed %}
+      {% if search.results_count > 0 %}
+        <p class="text-center mb-8">Found {{ search.results_count }} results</p>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {% for item in search.results %}
+            <div>
+              <a href="{{ item.url }}">
+                {% if item.featured_image %}
+                  <img src="{{ item.featured_image | img_url: '400x' }}" alt="{{ item.title }}" class="w-full rounded-lg mb-4">
+                {% endif %}
+                <h3 class="font-semibold">{{ item.title }}</h3>
+                <p class="text-brand-purple font-bold">{{ item.price | money }}</p>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-20">
+          <h2 class="text-2xl font-bold mb-4">No results found</h2>
+          <p>Try a different search term</p>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
