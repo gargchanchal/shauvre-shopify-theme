@@ -1,18 +1,69 @@
 {% comment %}
   Header Section - Shopify Theme
-  Includes navigation, logo, search, and cart
+  Includes navigation, logo, search, cart drawer, and announcement slider
 {% endcomment %}
 
 <header class="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-gray-200">
-  <!-- Announcement Bar -->
-  <div class="bg-brand-purple text-white text-center py-2 px-4">
-    <p class="text-sm font-medium">
-      {% if section.settings.announcement_text != blank %}
-        {{ section.settings.announcement_text }}
-      {% else %}
-        THE SUMMER COLLECTION HAS ARRIVED - SHOP NEW ARRIVALS NOW
-      {% endif %}
-    </p>
+  <!-- Announcement Bar Slider -->
+  <div class="announcement-bar bg-brand-purple text-white">
+    <div class="announcement-slider">
+      <div class="announcement-track">
+        <div class="announcement-slide active">
+          <p class="text-sm font-medium">
+            {% if section.settings.announcement_1 != blank %}
+              {{ section.settings.announcement_1 }}
+            {% else %}
+              THE SUMMER COLLECTION HAS ARRIVED - SHOP NEW ARRIVALS NOW
+            {% endif %}
+          </p>
+        </div>
+        <div class="announcement-slide">
+          <p class="text-sm font-medium">
+            {% if section.settings.announcement_2 != blank %}
+              {{ section.settings.announcement_2 }}
+            {% else %}
+              FREE SHIPPING ON ORDERS OVER $100 - LIMITED TIME OFFER
+            {% endif %}
+          </p>
+        </div>
+        <div class="announcement-slide">
+          <p class="text-sm font-medium">
+            {% if section.settings.announcement_3 != blank %}
+              {{ section.settings.announcement_3 }}
+            {% else %}
+              EXCLUSIVE: 20% OFF YOUR FIRST ORDER - USE CODE: WELCOME20
+            {% endif %}
+          </p>
+        </div>
+        <div class="announcement-slide">
+          <p class="text-sm font-medium">
+            {% if section.settings.announcement_4 != blank %}
+              {{ section.settings.announcement_4 }}
+            {% else %}
+              NEW SEASON, NEW STYLE - DISCOVER OUR LATEST TRENDS
+            {% endif %}
+          </p>
+        </div>
+        <div class="announcement-slide">
+          <p class="text-sm font-medium">
+            {% if section.settings.announcement_5 != blank %}
+              {{ section.settings.announcement_5 }}
+            {% else %}
+              EASY RETURNS - 30 DAY MONEY BACK GUARANTEE
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Navigation Dots -->
+    <div class="announcement-dots">
+      <button class="dot active" onclick="goToSlide(0)"></button>
+      <button class="dot" onclick="goToSlide(1)"></button>
+      <button class="dot" onclick="goToSlide(2)"></button>
+      <button class="dot" onclick="goToSlide(3)"></button>
+      <button class="dot" onclick="goToSlide(4)"></button>
+    </div>
   </div>
 
   <!-- Main Header -->
@@ -110,20 +161,14 @@
         </a>
         
         <!-- Cart -->
-        <a href="/cart" class="p-2 hover:bg-gray-100 rounded-md transition-colors relative" aria-label="Shopping bag">
+        <button onclick="openCartDrawer()" class="p-2 hover:bg-gray-100 rounded-md transition-colors relative" aria-label="Shopping bag">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
           </svg>
-          {% if cart.item_count > 0 %}
-            <span class="absolute -top-1 -right-1 bg-brand-gold text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              {{ cart.item_count }}
-            </span>
-          {% else %}
-            <span class="absolute -top-1 -right-1 bg-brand-gold text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              0
-            </span>
-          {% endif %}
-        </a>
+          <span class="absolute -top-1 -right-1 bg-brand-gold text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="cart-count">
+            {{ cart.item_count }}
+          </span>
+        </button>
       </div>
     </div>
 
@@ -143,6 +188,130 @@
   </div>
 </header>
 
+<!-- Announcement Bar Slider Styles & Script -->
+<style>
+.announcement-bar {
+  position: relative;
+  overflow: hidden;
+  padding: 0.5rem 1rem;
+}
+
+.announcement-slider {
+  position: relative;
+  height: 2rem;
+}
+
+.announcement-track {
+  position: relative;
+  height: 100%;
+}
+
+.announcement-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.5s ease;
+}
+
+.announcement-slide.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.announcement-slide.prev {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.announcement-dots {
+  position: absolute;
+  bottom: 0.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.announcement-dots .dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.announcement-dots .dot.active {
+  background: white;
+  width: 1.5rem;
+  border-radius: 0.25rem;
+}
+
+.announcement-dots .dot:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+</style>
+
+<script>
+let currentSlide = 0;
+const slides = document.querySelectorAll('.announcement-slide');
+const dots = document.querySelectorAll('.announcement-dots .dot');
+const totalSlides = slides.length;
+let slideInterval;
+
+function showSlide(n) {
+  // Remove active class from all slides and dots
+  slides.forEach(slide => {
+    slide.classList.remove('active', 'prev');
+  });
+  dots.forEach(dot => {
+    dot.classList.remove('active');
+  });
+  
+  // Set current slide
+  currentSlide = (n + totalSlides) % totalSlides;
+  
+  // Add active class to current slide and dot
+  slides[currentSlide].classList.add('active');
+  dots[currentSlide].classList.add('active');
+}
+
+function nextSlide() {
+  showSlide(currentSlide + 1);
+}
+
+function goToSlide(n) {
+  clearInterval(slideInterval);
+  showSlide(n);
+  startSlideShow();
+}
+
+function startSlideShow() {
+  slideInterval = setInterval(nextSlide, 4000); // Change slide every 4 seconds
+}
+
+// Initialize
+showSlide(0);
+startSlideShow();
+
+// Pause on hover
+document.querySelector('.announcement-bar').addEventListener('mouseenter', () => {
+  clearInterval(slideInterval);
+});
+
+document.querySelector('.announcement-bar').addEventListener('mouseleave', () => {
+  startSlideShow();
+});
+</script>
+
 {% schema %}
 {
   "name": "Header",
@@ -159,10 +328,38 @@
       "default": "main-menu"
     },
     {
+      "type": "header",
+      "content": "Announcement Bar Slider"
+    },
+    {
       "type": "text",
-      "id": "announcement_text",
-      "label": "Announcement Text",
+      "id": "announcement_1",
+      "label": "Announcement 1",
       "default": "THE SUMMER COLLECTION HAS ARRIVED - SHOP NEW ARRIVALS NOW"
+    },
+    {
+      "type": "text",
+      "id": "announcement_2",
+      "label": "Announcement 2",
+      "default": "FREE SHIPPING ON ORDERS OVER $100 - LIMITED TIME OFFER"
+    },
+    {
+      "type": "text",
+      "id": "announcement_3",
+      "label": "Announcement 3",
+      "default": "EXCLUSIVE: 20% OFF YOUR FIRST ORDER - USE CODE: WELCOME20"
+    },
+    {
+      "type": "text",
+      "id": "announcement_4",
+      "label": "Announcement 4",
+      "default": "NEW SEASON, NEW STYLE - DISCOVER OUR LATEST TRENDS"
+    },
+    {
+      "type": "text",
+      "id": "announcement_5",
+      "label": "Announcement 5",
+      "default": "EASY RETURNS - 30 DAY MONEY BACK GUARANTEE"
     }
   ]
 }
