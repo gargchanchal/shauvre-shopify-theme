@@ -1,0 +1,137 @@
+<script>
+// Product Page Interactive Scripts
+
+// Change main product image
+function changeMainImage(imageUrl) {
+  const mainImage = document.getElementById('main-product-image');
+  if (mainImage) {
+    mainImage.src = imageUrl;
+  }
+  
+  // Update active thumbnail
+  const thumbnails = document.querySelectorAll('.thumbnail');
+  thumbnails.forEach((thumb, index) => {
+    thumb.classList.remove('active');
+  });
+  event.currentTarget.classList.add('active');
+}
+
+// Change quantity
+function changeQuantity(delta) {
+  const qtyInput = document.getElementById('quantity');
+  if (qtyInput) {
+    const currentQty = parseInt(qtyInput.value) || 1;
+    const newQty = Math.max(1, currentQty + delta);
+    qtyInput.value = newQty;
+  }
+}
+
+// Toggle accordion
+function toggleAccordion(index) {
+  const accordionItems = document.querySelectorAll('.accordion-item');
+  const item = accordionItems[index];
+  
+  if (item) {
+    const header = item.querySelector('.accordion-header');
+    const content = item.querySelector('.accordion-content');
+    
+    // Close all other accordions
+    accordionItems.forEach((otherItem, otherIndex) => {
+      if (otherIndex !== index) {
+        otherItem.querySelector('.accordion-header').classList.remove('active');
+        otherItem.querySelector('.accordion-content').classList.remove('show');
+      }
+    });
+    
+    // Toggle current accordion
+    header.classList.toggle('active');
+    content.classList.toggle('show');
+  }
+}
+
+// Buy now functionality
+function buyNow() {
+  const form = document.getElementById('product-form');
+  if (form) {
+    // Add a hidden input to trigger direct checkout
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'return_to';
+    input.value = '/checkout';
+    form.appendChild(input);
+    
+    form.submit();
+  }
+}
+
+// Add to wishlist (placeholder)
+function addToWishlist() {
+  alert('Product added to wishlist!\n(Wishlist functionality requires a third-party app or custom implementation)');
+}
+
+// Open size guide modal
+function openSizeGuide() {
+  alert('Size Guide\n\nXS: Bust 30-32", Waist 23-25", Hips 33-35"\nS: Bust 32-34", Waist 25-27", Hips 35-37"\nM: Bust 34-36", Waist 27-29", Hips 37-39"\nL: Bust 36-38", Waist 29-31", Hips 39-41"\nXL: Bust 38-40", Waist 31-33", Hips 41-43"\n\n(For full size guide, implement a modal or separate page)');
+}
+
+// Open image zoom modal
+function openImageModal() {
+  const mainImage = document.getElementById('main-product-image');
+  if (mainImage) {
+    // Create a simple lightbox effect
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; cursor: zoom-out;';
+    
+    const img = document.createElement('img');
+    img.src = mainImage.src;
+    img.style.cssText = 'max-width: 90%; max-height: 90%; object-fit: contain;';
+    
+    modal.appendChild(img);
+    modal.onclick = function() {
+      document.body.removeChild(modal);
+    };
+    
+    document.body.appendChild(modal);
+  }
+}
+
+// Variant selection handling
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize first accordion as open
+  const firstAccordion = document.querySelector('.accordion-item');
+  if (firstAccordion) {
+    firstAccordion.querySelector('.accordion-header').classList.add('active');
+    firstAccordion.querySelector('.accordion-content').classList.add('show');
+  }
+  
+  // Handle variant selection changes
+  const variantInputs = document.querySelectorAll('input[name^="option-"]');
+  variantInputs.forEach(input => {
+    input.addEventListener('change', function() {
+      const optionName = this.closest('.variant-selector').querySelector('.variant-label').textContent.split('\n')[0].trim();
+      const selectedValueSpan = document.getElementById('selected-' + optionName.toLowerCase().replace(/\s+/g, '-'));
+      if (selectedValueSpan) {
+        selectedValueSpan.textContent = this.value;
+      }
+    });
+  });
+  
+  // Handle size button clicks
+  const sizeButtons = document.querySelectorAll('.size-btn');
+  sizeButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      sizeButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+  
+  // Handle color swatch clicks
+  const colorSwatches = document.querySelectorAll('.color-swatch');
+  colorSwatches.forEach(swatch => {
+    swatch.addEventListener('click', function() {
+      colorSwatches.forEach(s => s.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+});
+</script>
