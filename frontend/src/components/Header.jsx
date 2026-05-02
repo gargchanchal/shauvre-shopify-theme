@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingBag, Menu, X, Search, ChevronDown } from 'lucide-react';
 import { Button } from './ui/button';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [cartCount, setCartCount] = useState(0);
 
   const currencies = [
     { code: 'USD', symbol: '$', name: 'US Dollar' },
@@ -16,17 +18,61 @@ const Header = () => {
     { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
   ];
 
+  const announcements = [
+    "THE SUMMER COLLECTION HAS ARRIVED - SHOP NEW ARRIVALS NOW",
+    "FREE SHIPPING ON ORDERS OVER $100 - LIMITED TIME OFFER",
+    "EXCLUSIVE: 20% OFF YOUR FIRST ORDER - USE CODE: WELCOME20",
+    "NEW SEASON, NEW STYLE - DISCOVER OUR LATEST TRENDS",
+    "EASY RETURNS - 30 DAY MONEY BACK GUARANTEE"
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % announcements.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleCurrencyChange = (e) => {
     setSelectedCurrency(e.target.value);
-    // Store in localStorage for persistence
     localStorage.setItem('selectedCurrency', e.target.value);
+  };
+
+  const openCartDrawer = () => {
+    // This would open the cart drawer in a real implementation
+    alert('Cart drawer would open here');
   };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-gray-200">
-      {/* Announcement Bar */}
-      <div className="bg-[#4C1C5B] text-white text-center py-2 px-4">
-        <p className="text-sm font-medium">THE SUMMER COLLECTION HAS ARRIVED - SHOP NEW ARRIVALS NOW</p>
+      {/* Announcement Bar Slider */}
+      <div className="bg-[#4C1C5B] text-white relative overflow-hidden" style={{ height: '40px' }}>
+        <div className="relative h-full">
+          {announcements.map((announcement, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
+                index === currentSlide ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
+              }`}
+              style={{ transitionDelay: index === currentSlide ? '0ms' : '0ms' }}
+            >
+              <p className="text-sm font-medium px-4 text-center">{announcement}</p>
+            </div>
+          ))}
+        </div>
+        
+        {/* Dots */}
+        <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-1.5 z-10">
+          {announcements.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`h-1.5 rounded-full transition-all ${
+                index === currentSlide ? 'w-6 bg-white' : 'w-1.5 bg-white/40'
+              }`}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Main Header */}
