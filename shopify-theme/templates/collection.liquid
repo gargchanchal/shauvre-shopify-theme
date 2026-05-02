@@ -1,156 +1,772 @@
 {% comment %}
-  Collection Template - Shows all products in a collection
+  Collection Template - Premium Design with Advanced Filters
 {% endcomment %}
 
-<div class="collection-page py-12 bg-white">
-  <div class="container mx-auto px-6 md:px-12 lg:px-16">
-    
-    <!-- Collection Header -->
-    <div class="text-center mb-12">
-      {% if collection.image %}
-        <div class="mb-8 rounded-lg overflow-hidden max-w-4xl mx-auto">
-          <img 
-            src="{{ collection.image | img_url: '1200x' }}" 
-            alt="{{ collection.title }}"
-            class="w-full h-64 object-cover"
-          >
-        </div>
-      {% endif %}
-      
-      <h1 class="text-4xl md:text-5xl font-serif font-bold text-brand-purple mb-4">
-        {{ collection.title }}
-      </h1>
-      
-      {% if collection.description != blank %}
-        <div class="text-gray-600 max-w-2xl mx-auto text-lg">
-          {{ collection.description }}
-        </div>
-      {% endif %}
-      
-      <p class="text-gray-500 mt-4">
-        {{ collection.products_count }} 
-        {% if collection.products_count == 1 %}product{% else %}products{% endif %}
-      </p>
+<div class="collection-page bg-white">
+  <!-- Breadcrumb -->
+  <div class="border-b border-gray-100">
+    <div class="container mx-auto px-6 md:px-12 lg:px-16 py-4">
+      <nav class="text-sm text-gray-500">
+        <a href="/" class="hover:text-brand-purple transition-colors">Home</a>
+        <span class="mx-2">/</span>
+        <a href="/collections" class="hover:text-brand-purple transition-colors">Collections</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-900 font-medium">{{ collection.title }}</span>
+      </nav>
     </div>
+  </div>
 
-    <!-- Filter and Sort -->
-    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-      <div class="text-gray-600">
-        Showing {{ collection.products.size }} products
-      </div>
-      
-      <div class="flex gap-4">
-        <!-- Sort Dropdown -->
-        <select 
-          onchange="location.href=this.value"
-          class="px-4 py-2 border border-gray-200 rounded-md text-sm hover:border-brand-purple transition-colors"
-        >
-          <option value="{{ collection.url }}">Sort by: Featured</option>
-          <option value="{{ collection.url }}?sort_by=title-ascending">A-Z</option>
-          <option value="{{ collection.url }}?sort_by=title-descending">Z-A</option>
-          <option value="{{ collection.url }}?sort_by=price-ascending">Price: Low to High</option>
-          <option value="{{ collection.url }}?sort_by=price-descending">Price: High to Low</option>
-          <option value="{{ collection.url }}?sort_by=created-descending">Newest</option>
-        </select>
+  <!-- Collection Header -->
+  <div class="py-12 bg-gradient-to-b from-gray-50 to-white">
+    <div class="container mx-auto px-6 md:px-12 lg:px-16">
+      <div class="max-w-3xl mx-auto text-center">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-brand-purple mb-4">
+          {{ collection.title }}
+        </h1>
+        {% if collection.description != blank %}
+          <p class="text-lg text-gray-600 leading-relaxed">
+            {{ collection.description }}
+          </p>
+        {% endif %}
+        <p class="text-sm text-gray-500 mt-4">
+          {{ collection.products_count }} 
+          {% if collection.products_count == 1 %}Product{% else %}Products{% endif %}
+        </p>
       </div>
     </div>
+  </div>
 
-    <!-- Products Grid -->
-    {% paginate collection.products by 12 %}
-      {% if collection.products.size > 0 %}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {% for product in collection.products %}
-            <div class="product-card group">
-              <a href="{{ product.url }}" class="block">
-                <!-- Product Image -->
-                <div class="relative overflow-hidden rounded-lg mb-4 aspect-[3/4] bg-gray-100">
-                  {% if product.featured_image %}
-                    <img 
-                      src="{{ product.featured_image | img_url: '600x' }}" 
-                      alt="{{ product.title }}"
-                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    >
-                  {% else %}
-                    <div class="w-full h-full flex items-center justify-center text-gray-400">
-                      No image
-                    </div>
-                  {% endif %}
-                  
-                  <!-- Sale Badge -->
-                  {% if product.compare_at_price > product.price %}
-                    <span class="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                      SALE
-                    </span>
-                  {% endif %}
+  {% paginate collection.products by 12 %}
+    <div class="container mx-auto px-6 md:px-12 lg:px-16 py-12">
+      <div class="flex flex-col lg:flex-row gap-12">
+        
+        <!-- Filters Sidebar -->
+        <aside class="lg:w-80 flex-shrink-0">
+          <div class="sticky top-24">
+            <!-- Filter Header -->
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-lg font-semibold text-gray-900">Filters</h3>
+              <button class="text-sm text-brand-purple hover:text-brand-gold transition-colors" onclick="clearFilters()">
+                Clear All
+              </button>
+            </div>
+
+            <!-- Active Filters -->
+            <div id="active-filters" class="mb-6"></div>
+
+            <!-- Price Filter -->
+            <div class="filter-group">
+              <button class="filter-header" onclick="toggleFilter('price')">
+                <span class="font-semibold">Price Range</span>
+                <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+              <div class="filter-content" id="filter-price">
+                <div class="space-y-3">
+                  <label class="filter-option">
+                    <input type="checkbox" name="price" value="0-50">
+                    <span>Under $50</span>
+                  </label>
+                  <label class="filter-option">
+                    <input type="checkbox" name="price" value="50-100">
+                    <span>$50 - $100</span>
+                  </label>
+                  <label class="filter-option">
+                    <input type="checkbox" name="price" value="100-200">
+                    <span>$100 - $200</span>
+                  </label>
+                  <label class="filter-option">
+                    <input type="checkbox" name="price" value="200-500">
+                    <span>$200 - $500</span>
+                  </label>
+                  <label class="filter-option">
+                    <input type="checkbox" name="price" value="500+">
+                    <span>$500+</span>
+                  </label>
                 </div>
+              </div>
+            </div>
 
-                <!-- Product Info -->
-                <div class="space-y-2">
-                  <h3 class="text-lg font-semibold text-gray-900 group-hover:text-brand-purple transition-colors">
-                    {{ product.title }}
-                  </h3>
-                  
-                  <!-- Price -->
-                  <div class="flex items-center gap-2">
-                    {% if product.compare_at_price > product.price %}
-                      <span class="text-lg font-bold text-red-600">
-                        {{ product.price | money }}
-                      </span>
-                      <span class="text-sm text-gray-400 line-through">
-                        {{ product.compare_at_price | money }}
-                      </span>
-                    {% else %}
-                      <span class="text-lg font-bold text-gray-900">
-                        {{ product.price | money }}
-                      </span>
-                    {% endif %}
+            <!-- Size Filter -->
+            <div class="filter-group">
+              <button class="filter-header" onclick="toggleFilter('size')">
+                <span class="font-semibold">Size</span>
+                <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+              <div class="filter-content" id="filter-size">
+                <div class="grid grid-cols-3 gap-2">
+                  <button class="size-btn">XS</button>
+                  <button class="size-btn">S</button>
+                  <button class="size-btn">M</button>
+                  <button class="size-btn">L</button>
+                  <button class="size-btn">XL</button>
+                  <button class="size-btn">XXL</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Color Filter -->
+            <div class="filter-group">
+              <button class="filter-header" onclick="toggleFilter('color')">
+                <span class="font-semibold">Color</span>
+                <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+              <div class="filter-content" id="filter-color">
+                <div class="grid grid-cols-6 gap-2">
+                  <button class="color-swatch" style="background: #000" data-color="Black" title="Black"></button>
+                  <button class="color-swatch" style="background: #fff; border: 1px solid #ddd" data-color="White" title="White"></button>
+                  <button class="color-swatch" style="background: #d1d5db" data-color="Gray" title="Gray"></button>
+                  <button class="color-swatch" style="background: #1e40af" data-color="Blue" title="Blue"></button>
+                  <button class="color-swatch" style="background: #dc2626" data-color="Red" title="Red"></button>
+                  <button class="color-swatch" style="background: #16a34a" data-color="Green" title="Green"></button>
+                  <button class="color-swatch" style="background: #eab308" data-color="Yellow" title="Yellow"></button>
+                  <button class="color-swatch" style="background: #ec4899" data-color="Pink" title="Pink"></button>
+                  <button class="color-swatch" style="background: #7c3aed" data-color="Purple" title="Purple"></button>
+                  <button class="color-swatch" style="background: #f97316" data-color="Orange" title="Orange"></button>
+                  <button class="color-swatch" style="background: #0891b2" data-color="Cyan" title="Cyan"></button>
+                  <button class="color-swatch" style="background: #a16207" data-color="Brown" title="Brown"></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="filter-group">
+              <button class="filter-header" onclick="toggleFilter('category')">
+                <span class="font-semibold">Category</span>
+                <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+              <div class="filter-content" id="filter-category">
+                <div class="space-y-3">
+                  <label class="filter-option">
+                    <input type="checkbox" name="category" value="dresses">
+                    <span>Dresses</span>
+                  </label>
+                  <label class="filter-option">
+                    <input type="checkbox" name="category" value="tops">
+                    <span>Tops & Blouses</span>
+                  </label>
+                  <label class="filter-option">
+                    <input type="checkbox" name="category" value="bottoms">
+                    <span>Bottoms</span>
+                  </label>
+                  <label class="filter-option">
+                    <input type="checkbox" name="category" value="outerwear">
+                    <span>Outerwear</span>
+                  </label>
+                  <label class="filter-option">
+                    <input type="checkbox" name="category" value="accessories">
+                    <span>Accessories</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Products Area -->
+        <div class="flex-1">
+          <!-- Toolbar -->
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-6 border-b border-gray-200">
+            <p class="text-gray-600">
+              Showing <span class="font-semibold text-gray-900">{{ collection.products.size }}</span> of 
+              <span class="font-semibold text-gray-900">{{ collection.products_count }}</span> products
+            </p>
+            
+            <div class="flex items-center gap-4">
+              <!-- View Toggle -->
+              <div class="flex bg-gray-100 rounded-lg p-1">
+                <button class="view-btn active" data-view="grid" onclick="toggleView('grid')">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                  </svg>
+                </button>
+                <button class="view-btn" data-view="list" onclick="toggleView('list')">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Sort -->
+              <select onchange="location.href=this.value" class="sort-select">
+                <option value="{{ collection.url }}">Featured</option>
+                <option value="{{ collection.url }}?sort_by=title-ascending">A-Z</option>
+                <option value="{{ collection.url }}?sort_by=title-descending">Z-A</option>
+                <option value="{{ collection.url }}?sort_by=price-ascending">Price: Low to High</option>
+                <option value="{{ collection.url }}?sort_by=price-descending">Price: High to Low</option>
+                <option value="{{ collection.url }}?sort_by=created-descending">Newest First</option>
+                <option value="{{ collection.url }}?sort_by=best-selling">Best Selling</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Products Grid -->
+          {% if collection.products.size > 0 %}
+            <div class="products-grid grid-view" id="products-container">
+              {% for product in collection.products %}
+                <div class="product-card-wrapper">
+                  <div class="product-card">
+                    <a href="{{ product.url }}" class="product-image-wrapper">
+                      <div class="product-image">
+                        {% if product.featured_image %}
+                          <img 
+                            src="{{ product.featured_image | img_url: '600x' }}" 
+                            alt="{{ product.title }}"
+                            class="main-image"
+                            loading="lazy"
+                          >
+                          {% if product.images[1] %}
+                            <img 
+                              src="{{ product.images[1] | img_url: '600x' }}" 
+                              alt="{{ product.title }}"
+                              class="hover-image"
+                              loading="lazy"
+                            >
+                          {% endif %}
+                        {% else %}
+                          <div class="no-image">No image</div>
+                        {% endif %}
+                      </div>
+                      
+                      <!-- Badges -->
+                      <div class="product-badges">
+                        {% if product.compare_at_price > product.price %}
+                          {% assign savings = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price %}
+                          <span class="badge badge-sale">-{{ savings }}%</span>
+                        {% endif %}
+                        {% assign days_old = 'now' | date: '%s' | minus: product.published_at | date: '%s' | divided_by: 86400 %}
+                        {% if days_old < 30 %}
+                          <span class="badge badge-new">New</span>
+                        {% endif %}
+                      </div>
+
+                      <!-- Quick View -->
+                      <button class="quick-view-btn" onclick="quickView('{{ product.handle }}')">
+                        Quick View
+                      </button>
+                    </a>
+
+                    <div class="product-info">
+                      {% if product.vendor %}
+                        <p class="product-vendor">{{ product.vendor }}</p>
+                      {% endif %}
+                      
+                      <h3 class="product-title">
+                        <a href="{{ product.url }}">{{ product.title }}</a>
+                      </h3>
+                      
+                      <div class="product-price">
+                        {% if product.compare_at_price > product.price %}
+                          <span class="price-sale">{{ product.price | money }}</span>
+                          <span class="price-compare">{{ product.compare_at_price | money }}</span>
+                        {% else %}
+                          <span class="price-regular">{{ product.price | money }}</span>
+                        {% endif %}
+                      </div>
+
+                      <!-- Color Swatches (if available) -->
+                      {% if product.variants.size > 1 %}
+                        <div class="product-colors">
+                          {% for variant in product.variants limit: 5 %}
+                            <span class="color-dot"></span>
+                          {% endfor %}
+                          {% if product.variants.size > 5 %}
+                            <span class="text-xs text-gray-500">+{{ product.variants.size | minus: 5 }}</span>
+                          {% endif %}
+                        </div>
+                      {% endif %}
+                    </div>
                   </div>
                 </div>
-              </a>
-            </div>
-          {% endfor %}
-        </div>
-
-        <!-- Pagination -->
-        {% if paginate.pages > 1 %}
-          <div class="mt-12 flex justify-center">
-            <nav class="flex items-center gap-2">
-              {% if paginate.previous %}
-                <a href="{{ paginate.previous.url }}" class="px-4 py-2 border border-gray-200 rounded-md hover:border-brand-purple transition-colors">
-                  Previous
-                </a>
-              {% endif %}
-              
-              {% for part in paginate.parts %}
-                {% if part.is_link %}
-                  <a href="{{ part.url }}" class="px-4 py-2 border border-gray-200 rounded-md hover:border-brand-purple transition-colors">
-                    {{ part.title }}
-                  </a>
-                {% else %}
-                  <span class="px-4 py-2 bg-brand-purple text-white rounded-md">
-                    {{ part.title }}
-                  </span>
-                {% endif %}
               {% endfor %}
-              
-              {% if paginate.next %}
-                <a href="{{ paginate.next.url }}" class="px-4 py-2 border border-gray-200 rounded-md hover:border-brand-purple transition-colors">
-                  Next
-                </a>
-              {% endif %}
-            </nav>
-          </div>
-        {% endif %}
-      {% else %}
-        <!-- Empty State -->
-        <div class="text-center py-20">
-          <p class="text-xl text-gray-600 mb-4">No products in this collection yet.</p>
-          <a href="/collections" class="text-brand-purple hover:text-brand-gold transition-colors">
-            Browse all collections
-          </a>
+            </div>
+
+            <!-- Pagination -->
+            {% if paginate.pages > 1 %}
+              <div class="pagination">
+                {% if paginate.previous %}
+                  <a href="{{ paginate.previous.url }}" class="page-btn">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Previous
+                  </a>
+                {% endif %}
+                
+                <div class="page-numbers">
+                  {% for part in paginate.parts %}
+                    {% if part.is_link %}
+                      <a href="{{ part.url }}" class="page-number">{{ part.title }}</a>
+                    {% else %}
+                      <span class="page-number active">{{ part.title }}</span>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                
+                {% if paginate.next %}
+                  <a href="{{ paginate.next.url }}" class="page-btn">
+                    Next
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </a>
+                {% endif %}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="empty-state">
+              <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+              </svg>
+              <h3 class="empty-title">No products found</h3>
+              <p class="empty-text">Try adjusting your filters or search criteria</p>
+            </div>
+          {% endif %}
         </div>
-      {% endif %}
-    {% endpaginate %}
-  </div>
+      </div>
+    </div>
+  {% endpaginate %}
 </div>
+
+<style>
+/* Collection Page Styles */
+.filter-group {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1.5rem 0;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 1rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.filter-header:hover {
+  color: #4C1C5B;
+}
+
+.filter-header.active svg {
+  transform: rotate(180deg);
+}
+
+.filter-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.filter-content.show {
+  max-height: 500px;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  transition: background 0.2s;
+}
+
+.filter-option:hover {
+  background: #f3f4f6;
+}
+
+.filter-option input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid #d1d5db;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.filter-option input[type="checkbox"]:checked {
+  background: #4C1C5B;
+  border-color: #4C1C5B;
+}
+
+.size-btn {
+  padding: 0.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.size-btn:hover {
+  border-color: #4C1C5B;
+  color: #4C1C5B;
+}
+
+.size-btn.active {
+  background: #4C1C5B;
+  border-color: #4C1C5B;
+  color: white;
+}
+
+.color-swatch {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: 0 0 0 2px transparent;
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+}
+
+.color-swatch.active {
+  box-shadow: 0 0 0 2px #4C1C5B;
+}
+
+.view-btn {
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.view-btn.active {
+  background: white;
+  color: #4C1C5B;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.sort-select {
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.sort-select:hover,
+.sort-select:focus {
+  border-color: #4C1C5B;
+  outline: none;
+}
+
+.products-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.products-grid.grid-view {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.products-grid.list-view .product-card-wrapper {
+  grid-column: 1 / -1;
+}
+
+.products-grid.list-view .product-card {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 2rem;
+}
+
+.product-card {
+  position: relative;
+  background: white;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(76, 28, 91, 0.1);
+}
+
+.product-image-wrapper {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: #f9fafb;
+  aspect-ratio: 3/4;
+}
+
+.product-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-image .hover-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.product-card:hover .hover-image {
+  opacity: 1;
+}
+
+.product-badges {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.badge {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  backdrop-filter: blur(8px);
+}
+
+.badge-sale {
+  background: rgba(239, 68, 68, 0.95);
+  color: white;
+}
+
+.badge-new {
+  background: rgba(225, 146, 29, 0.95);
+  color: white;
+}
+
+.quick-view-btn {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(2rem);
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #4C1C5B;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 9999px;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 2;
+}
+
+.product-card:hover .quick-view-btn {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.quick-view-btn:hover {
+  background: #4C1C5B;
+  color: white;
+}
+
+.product-info {
+  padding: 1.25rem 0;
+}
+
+.product-vendor {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #6b7280;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.product-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.product-title a:hover {
+  color: #4C1C5B;
+}
+
+.product-price {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.price-sale {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.price-compare {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.price-regular {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.product-colors {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.color-dot {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 3rem;
+}
+
+.page-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.page-btn:hover {
+  border-color: #4C1C5B;
+  color: #4C1C5B;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.page-number {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  min-width: 3rem;
+  text-align: center;
+}
+
+.page-number:hover {
+  border-color: #4C1C5B;
+  color: #4C1C5B;
+}
+
+.page-number.active {
+  background: #4C1C5B;
+  border-color: #4C1C5B;
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.empty-icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1.5rem;
+  color: #d1d5db;
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.empty-text {
+  color: #6b7280;
+}
+
+@media (max-width: 1024px) {
+  .products-grid.grid-view {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .products-grid.grid-view {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+</style>
+
+<script>
+function toggleFilter(filterId) {
+  const content = document.getElementById('filter-' + filterId);
+  const header = content.previousElementSibling;
+  
+  content.classList.toggle('show');
+  header.classList.toggle('active');
+}
+
+function toggleView(view) {
+  const container = document.getElementById('products-container');
+  const buttons = document.querySelectorAll('.view-btn');
+  
+  container.className = 'products-grid ' + view + '-view';
+  
+  buttons.forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === view);
+  });
+}
+
+function clearFilters() {
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+  document.querySelectorAll('.size-btn.active').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.color-swatch.active').forEach(sw => sw.classList.remove('active'));
+}
+
+function quickView(handle) {
+  alert('Quick view for: ' + handle + '\n(This would open a modal with product details)');
+}
+
+// Initialize - show all filters by default
+document.addEventListener('DOMContentLoaded', function() {
+  ['price', 'size', 'color', 'category'].forEach(filterId => {
+    document.getElementById('filter-' + filterId).classList.add('show');
+    document.getElementById('filter-' + filterId).previousElementSibling.classList.add('active');
+  });
+});
+</script>

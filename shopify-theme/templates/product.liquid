@@ -1,49 +1,75 @@
 {% comment %}
-  Product Template - Individual product page
+  Product Template - Premium Design with All Features
 {% endcomment %}
 
-<div class="product-page py-12 bg-white">
-  <div class="container mx-auto px-6 md:px-12 lg:px-16">
-    
-    <!-- Breadcrumb -->
-    <nav class="text-sm text-gray-500 mb-8">
-      <a href="/" class="hover:text-brand-purple transition-colors">Home</a>
-      <span class="mx-2">/</span>
-      {% if product.collections.size > 0 %}
-        <a href="{{ product.collections.first.url }}" class="hover:text-brand-purple transition-colors">
-          {{ product.collections.first.title }}
-        </a>
+<div class="product-page bg-white">
+  <!-- Breadcrumb -->
+  <div class="border-b border-gray-100">
+    <div class="container mx-auto px-6 md:px-12 lg:px-16 py-4">
+      <nav class="text-sm text-gray-500">
+        <a href="/" class="hover:text-brand-purple transition-colors">Home</a>
         <span class="mx-2">/</span>
-      {% endif %}
-      <span class="text-gray-900">{{ product.title }}</span>
-    </nav>
+        {% if product.collections.size > 0 %}
+          <a href="{{ product.collections.first.url }}" class="hover:text-brand-purple transition-colors">
+            {{ product.collections.first.title }}
+          </a>
+          <span class="mx-2">/</span>
+        {% endif %}
+        <span class="text-gray-900 font-medium">{{ product.title }}</span>
+      </nav>
+    </div>
+  </div>
 
+  <div class="container mx-auto px-6 md:px-12 lg:px-16 py-12">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
       
-      <!-- Product Images -->
-      <div class="space-y-4">
+      <!-- Product Gallery -->
+      <div class="product-gallery sticky top-24">
         <!-- Main Image -->
-        <div class="rounded-lg overflow-hidden aspect-[3/4] bg-gray-100">
-          <img 
-            id="main-product-image"
-            src="{{ product.featured_image | img_url: '1000x' }}" 
-            alt="{{ product.title }}"
-            class="w-full h-full object-cover"
-          >
+        <div class="main-image-container">
+          <div class="main-image-wrapper" id="main-image-container">
+            {% if product.featured_image %}
+              <img 
+                id="main-product-image"
+                src="{{ product.featured_image | img_url: '1200x' }}" 
+                alt="{{ product.title }}"
+                class="main-product-image"
+              >
+            {% endif %}
+            
+            <!-- Zoom Icon -->
+            <button class="zoom-btn" onclick="openImageModal()">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+              </svg>
+            </button>
+
+            <!-- Badges -->
+            <div class="product-badges-gallery">
+              {% if product.compare_at_price > product.price %}
+                {% assign savings = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price %}
+                <span class="badge badge-sale">-{{ savings }}%</span>
+              {% endif %}
+              {% assign days_old = 'now' | date: '%s' | minus: product.published_at | date: '%s' | divided_by: 86400 %}
+              {% if days_old < 30 %}
+                <span class="badge badge-new">New Arrival</span>
+              {% endif %}
+            </div>
+          </div>
         </div>
         
         <!-- Thumbnail Gallery -->
         {% if product.images.size > 1 %}
-          <div class="grid grid-cols-4 gap-4">
+          <div class="thumbnails-container">
             {% for image in product.images %}
               <button 
-                onclick="document.getElementById('main-product-image').src='{{ image | img_url: '1000x' }}'"
-                class="rounded-md overflow-hidden border-2 border-transparent hover:border-brand-purple transition-colors aspect-square"
+                onclick="changeMainImage('{{ image | img_url: '1200x' }}')"
+                class="thumbnail {% if forloop.first %}active{% endif %}"
+                data-index="{{ forloop.index0 }}"
               >
                 <img 
                   src="{{ image | img_url: '200x' }}" 
                   alt="{{ product.title }}"
-                  class="w-full h-full object-cover"
                 >
               </button>
             {% endfor %}
@@ -52,97 +78,297 @@
       </div>
 
       <!-- Product Info -->
-      <div class="space-y-6">
-        <div>
-          <h1 class="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-4">
-            {{ product.title }}
-          </h1>
-          
-          <div class="flex items-baseline gap-3">
-            {% if product.compare_at_price > product.price %}
-              <span class="text-3xl font-bold text-red-600">
-                {{ product.price | money }}
-              </span>
-              <span class="text-xl text-gray-400 line-through">
-                {{ product.compare_at_price | money }}
-              </span>
-            {% else %}
-              <span class="text-3xl font-bold text-gray-900">
-                {{ product.price | money }}
-              </span>
-            {% endif %}
+      <div class="product-details">
+        <!-- Vendor -->
+        {% if product.vendor != blank %}
+          <p class="product-vendor">{{ product.vendor }}</p>
+        {% endif %}
+        
+        <!-- Title -->
+        <h1 class="product-title">{{ product.title }}</h1>
+        
+        <!-- Reviews (Placeholder) -->
+        <div class="product-reviews">
+          <div class="stars">
+            <span>★★★★★</span>
           </div>
+          <a href="#reviews" class="review-link">(24 reviews)</a>
+        </div>
+        
+        <!-- Price -->
+        <div class="product-price-section">
+          {% if product.compare_at_price > product.price %}
+            <div class="price-with-sale">
+              <span class="price-sale">{{ product.selected_or_first_available_variant.price | money }}</span>
+              <span class="price-compare">{{ product.selected_or_first_available_variant.compare_at_price | money }}</span>
+              {% assign savings = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price %}
+              <span class="savings-badge">Save {{ savings }}%</span>
+            </div>
+          {% else %}
+            <span class="price-regular">{{ product.selected_or_first_available_variant.price | money }}</span>
+          {% endif %}
+          <p class="tax-note">Tax included. Shipping calculated at checkout.</p>
         </div>
 
-        <!-- Description -->
-        {% if product.description != blank %}
-          <div class="text-gray-600 leading-relaxed border-t border-b border-gray-200 py-6">
-            {{ product.description }}
-          </div>
+        <!-- Short Description -->
+        {% if product.metafields.custom.short_description %}
+          <p class="short-description">{{ product.metafields.custom.short_description }}</p>
         {% endif %}
 
         <!-- Product Form -->
-        {% form 'product', product %}
-          <div class="space-y-6">
+        {% form 'product', product, id: 'product-form' %}
+          <div class="product-form-section">
+            
             <!-- Variants -->
             {% unless product.has_only_default_variant %}
-              <div>
-                <label class="block text-sm font-semibold text-gray-900 mb-3">Options</label>
-                <select name="id" class="w-full px-4 py-3 border border-gray-200 rounded-md">
-                  {% for variant in product.variants %}
-                    <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>
-                      {{ variant.title }} - {{ variant.price | money }}
-                    </option>
-                  {% endfor %}
-                </select>
-              </div>
+              {% for option in product.options_with_values %}
+                <div class="variant-selector">
+                  <label class="variant-label">
+                    {{ option.name }}
+                    <span class="selected-value" id="selected-{{ option.name | handleize }}">
+                      {{ option.selected_value }}
+                    </span>
+                  </label>
+                  
+                  <div class="variant-options">
+                    {% if option.name == 'Color' or option.name == 'Colour' %}
+                      <!-- Color Swatches -->
+                      {% for value in option.values %}
+                        <label class="color-option">
+                          <input 
+                            type="radio" 
+                            name="option-{{ option.position }}"
+                            value="{{ value }}"
+                            {% if option.selected_value == value %}checked{% endif %}
+                          >
+                          <span class="color-swatch-large" style="background: {{ value | handleize }}" title="{{ value }}">
+                            <span class="color-name">{{ value }}</span>
+                          </span>
+                        </label>
+                      {% endfor %}
+                    {% elsif option.name == 'Size' %}
+                      <!-- Size Buttons -->
+                      {% for value in option.values %}
+                        <label class="size-option">
+                          <input 
+                            type="radio" 
+                            name="option-{{ option.position }}"
+                            value="{{ value }}"
+                            {% if option.selected_value == value %}checked{% endif %}
+                          >
+                          <span class="size-value">{{ value }}</span>
+                        </label>
+                      {% endfor %}
+                      <button type="button" class="size-guide-btn" onclick="openSizeGuide()">
+                        Size Guide
+                      </button>
+                    {% else %}
+                      <!-- Dropdown for other options -->
+                      <select name="option-{{ option.position }}" class="variant-dropdown">
+                        {% for value in option.values %}
+                          <option value="{{ value }}" {% if option.selected_value == value %}selected{% endif %}>
+                            {{ value }}
+                          </option>
+                        {% endfor %}
+                      </select>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
             {% endunless %}
 
-            <!-- Quantity -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-900 mb-3">Quantity</label>
-              <input 
-                type="number" 
-                name="quantity" 
-                value="1" 
-                min="1"
-                class="w-24 px-4 py-3 border border-gray-200 rounded-md"
+            <!-- Quantity & Add to Cart -->
+            <div class="quantity-cart-section">
+              <div class="quantity-selector">
+                <label class="quantity-label">Quantity</label>
+                <div class="quantity-controls">
+                  <button type="button" onclick="changeQuantity(-1)" class="qty-btn">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                    </svg>
+                  </button>
+                  <input 
+                    type="number" 
+                    name="quantity" 
+                    id="quantity"
+                    value="1" 
+                    min="1"
+                    class="qty-input"
+                  >
+                  <button type="button" onclick="changeQuantity(1)" class="qty-btn">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <button 
+                type="submit"
+                name="add"
+                class="add-to-cart-btn"
+                {% unless product.available %}disabled{% endunless %}
               >
+                {% if product.available %}
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                  </svg>
+                  Add to Cart
+                {% else %}
+                  Sold Out
+                {% endif %}
+              </button>
             </div>
 
-            <!-- Add to Cart Button -->
-            <button 
-              type="submit"
-              class="w-full bg-brand-purple hover:bg-brand-gold text-white font-semibold py-4 px-8 rounded-md transition-all duration-300 hover:shadow-lg"
-              {% unless product.available %}disabled{% endunless %}
-            >
-              {% if product.available %}
-                Add to Cart
-              {% else %}
-                Sold Out
-              {% endif %}
+            <!-- Buy Now Button -->
+            {% if product.available %}
+              <button type="button" class="buy-now-btn" onclick="buyNow()">
+                Buy it Now
+              </button>
+            {% endif %}
+
+            <!-- Wishlist -->
+            <button type="button" class="wishlist-btn" onclick="addToWishlist()">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+              Add to Wishlist
             </button>
           </div>
         {% endform %}
 
-        <!-- Product Features -->
-        <div class="grid grid-cols-2 gap-4 pt-6 border-t border-gray-200">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl">🚚</span>
+        <!-- Trust Badges -->
+        <div class="trust-badges">
+          <div class="trust-item">
+            <svg class="trust-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
             <div>
-              <p class="text-sm font-semibold">Free Shipping</p>
-              <p class="text-xs text-gray-500">On orders over $100</p>
+              <p class="trust-title">Premium Quality</p>
+              <p class="trust-desc">Finest materials & craftsmanship</p>
             </div>
           </div>
-          <div class="flex items-center gap-3">
-            <span class="text-2xl">↩️</span>
+          <div class="trust-item">
+            <svg class="trust-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+            </svg>
             <div>
-              <p class="text-sm font-semibold">Easy Returns</p>
-              <p class="text-xs text-gray-500">30-day policy</p>
+              <p class="trust-title">Free Shipping</p>
+              <p class="trust-desc">On orders over $100</p>
             </div>
+          </div>
+          <div class="trust-item">
+            <svg class="trust-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            <div>
+              <p class="trust-title">Easy Returns</p>
+              <p class="trust-desc">30-day return policy</p>
+            </div>
+          </div>
+          <div class="trust-item">
+            <svg class="trust-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            <div>
+              <p class="trust-title">Secure Payment</p>
+              <p class="trust-desc">SSL encrypted checkout</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion Details -->
+        <div class="product-accordion">
+          <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(0)">
+              <span>Product Details</span>
+              <svg class="accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                {{ product.description }}
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(1)">
+              <span>Shipping & Returns</span>
+              <svg class="accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <p><strong>Shipping:</strong> Free standard shipping on orders over $100. Express shipping available.</p>
+                <p class="mt-2"><strong>Returns:</strong> 30-day return policy. Items must be unworn and in original packaging.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(2)">
+              <span>Care Instructions</span>
+              <svg class="accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Hand wash cold or dry clean</li>
+                  <li>Do not bleach</li>
+                  <li>Hang to dry</li>
+                  <li>Iron on low heat if needed</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Share -->
+        <div class="product-share">
+          <p class="share-label">Share this product</p>
+          <div class="share-buttons">
+            <a href="https://www.facebook.com/sharer.php?u={{ shop.url }}{{ product.url }}" target="_blank" class="share-btn">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+            <a href="https://twitter.com/intent/tweet?url={{ shop.url }}{{ product.url }}&text={{ product.title }}" target="_blank" class="share-btn">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+            </a>
+            <a href="https://pinterest.com/pin/create/button/?url={{ shop.url }}{{ product.url }}&media={{ product.featured_image | img_url: '600x' }}" target="_blank" class="share-btn">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.372 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.690 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.350-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"/></svg>
+            </a>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Related Products -->
+    {% if product.collections.first.products.size > 1 %}
+      <div class="related-products-section">
+        <h2 class="section-title">You May Also Like</h2>
+        <div class="related-products-grid">
+          {% for related_product in product.collections.first.products limit: 4 %}
+            {% unless related_product.handle == product.handle %}
+              <a href="{{ related_product.url }}" class="related-product-card">
+                <div class="related-product-image">
+                  {% if related_product.featured_image %}
+                    <img src="{{ related_product.featured_image | img_url: '400x' }}" alt="{{ related_product.title }}">
+                  {% endif %}
+                </div>
+                <h3 class="related-product-title">{{ related_product.title }}</h3>
+                <p class="related-product-price">{{ related_product.price | money }}</p>
+              </a>
+            {% endunless %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
   </div>
 </div>
+
+{% render 'product-page-styles' %}
+{% render 'product-page-scripts' %}
