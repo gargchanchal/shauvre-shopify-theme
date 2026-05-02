@@ -9,6 +9,7 @@ import NewsletterSection from './components/NewsletterSection';
 import Footer from './components/Footer';
 import CollectionPage from './pages/CollectionPage';
 import ProductPage from './pages/ProductPage';
+import CollectionsListPage from './pages/CollectionsListPage';
 import { Toaster } from './components/ui/sonner';
 
 function HomePage() {
@@ -29,6 +30,7 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/collections" element={<CollectionsListPage />} />
           <Route path="/collections/:id" element={<CollectionPage />} />
           <Route path="/products/:id" element={<ProductPage />} />
         </Routes>

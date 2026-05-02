@@ -1,0 +1,341 @@
+{% comment %}
+  List Collections Template - All Collections Gallery
+  Shows a beautiful grid of all your store's collections
+{% endcomment %}
+
+<div class="collections-list-page bg-white">
+  <!-- Breadcrumb -->
+  <div class="border-b border-gray-100">
+    <div class="container mx-auto px-6 md:px-12 lg:px-16 py-4">
+      <nav class="text-sm text-gray-500">
+        <a href="/" class="hover:text-brand-purple transition-colors">Home</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-900 font-medium">Collections</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="py-16 bg-gradient-to-b from-gray-50 to-white">
+    <div class="container mx-auto px-6 md:px-12 lg:px-16">
+      <div class="max-w-3xl mx-auto text-center">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-brand-purple mb-4">
+          Our Collections
+        </h1>
+        <p class="text-lg text-gray-600 leading-relaxed">
+          Explore our curated collections of timeless elegance and modern sophistication
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Collections Grid -->
+  <div class="container mx-auto px-6 md:px-12 lg:px-16 py-16">
+    <div class="collections-grid">
+      {% for collection in collections %}
+        {% unless collection.handle == 'frontpage' %}
+          <a href="{{ collection.url }}" class="collection-card group">
+            <!-- Background Image -->
+            <div class="collection-image-wrapper">
+              {% if collection.image %}
+                <img
+                  src="{{ collection.image | img_url: '800x' }}"
+                  alt="{{ collection.title }}"
+                  class="collection-image"
+                  loading="lazy"
+                >
+              {% else %}
+                {% comment %} Fallback if no collection image {% endcomment %}
+                {% if collection.products.first.featured_image %}
+                  <img
+                    src="{{ collection.products.first.featured_image | img_url: '800x' }}"
+                    alt="{{ collection.title }}"
+                    class="collection-image"
+                    loading="lazy"
+                  >
+                {% else %}
+                  <div class="collection-placeholder">
+                    <svg class="placeholder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                  </div>
+                {% endif %}
+              {% endif %}
+              
+              <!-- Gradient Overlay -->
+              <div class="collection-overlay"></div>
+            </div>
+
+            <!-- Content -->
+            <div class="collection-content">
+              <!-- Item Count Badge -->
+              <div class="collection-badge">
+                <span class="badge-text">
+                  {{ collection.all_products_count }} 
+                  {% if collection.all_products_count == 1 %}Item{% else %}Items{% endif %}
+                </span>
+              </div>
+
+              <!-- Collection Info -->
+              <div class="collection-info">
+                <h2 class="collection-title">{{ collection.title }}</h2>
+                
+                {% if collection.description != blank %}
+                  <p class="collection-description">
+                    {{ collection.description | strip_html | truncate: 120 }}
+                  </p>
+                {% endif %}
+                
+                <!-- CTA -->
+                <div class="collection-cta">
+                  <span class="cta-text">Shop Collection</span>
+                  <svg class="cta-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hover Border Effect -->
+            <div class="collection-border"></div>
+          </a>
+        {% endunless %}
+      {% endfor %}
+    </div>
+
+    <!-- Featured Text Below -->
+    <div class="featured-text">
+      <p class="featured-label">Crafted with Excellence</p>
+      <h3 class="featured-title">Each collection tells a story of timeless elegance</h3>
+      <p class="featured-description">
+        From ready-to-wear pieces to elegant evening gowns, discover curated selections 
+        that blend vintage couture with modern sophistication.
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Collections List Page Styles */
+.collections-list-page {
+  min-height: 100vh;
+}
+
+.collections-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .collections-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
+  }
+}
+
+.collection-card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: #f3f4f6;
+  aspect-ratio: 4/5;
+  cursor: pointer;
+}
+
+.collection-image-wrapper {
+  position: absolute;
+  inset: 0;
+}
+
+.collection-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.collection-card:hover .collection-image {
+  transform: scale(1.1);
+}
+
+.collection-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+}
+
+.placeholder-icon {
+  width: 5rem;
+  height: 5rem;
+  color: #9ca3af;
+}
+
+.collection-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
+}
+
+.collection-content {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 2rem 2.5rem;
+  z-index: 2;
+}
+
+@media (min-width: 1024px) {
+  .collection-content {
+    padding: 2.5rem;
+  }
+}
+
+.collection-badge {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+}
+
+.badge-text {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  color: #4C1C5B;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.collection-info {
+  transform: translateY(0);
+  transition: transform 0.3s ease;
+}
+
+.collection-card:hover .collection-info {
+  transform: translateY(-0.5rem);
+}
+
+.collection-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.75rem;
+  font-family: Georgia, serif;
+  line-height: 1.2;
+}
+
+@media (min-width: 1024px) {
+  .collection-title {
+    font-size: 2.25rem;
+  }
+}
+
+.collection-description {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  line-height: 1.75;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .collection-description {
+    font-size: 1.125rem;
+  }
+}
+
+.collection-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  font-weight: 600;
+}
+
+.cta-text {
+  border-bottom: 2px solid #E1921D;
+  padding-bottom: 0.25rem;
+}
+
+.cta-arrow {
+  width: 1.25rem;
+  height: 1.25rem;
+  transition: transform 0.3s ease;
+}
+
+.collection-card:hover .cta-arrow {
+  transform: translateX(0.5rem);
+}
+
+.collection-border {
+  position: absolute;
+  inset: 0;
+  border: 4px solid #4C1C5B;
+  border-radius: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.collection-card:hover .collection-border {
+  opacity: 1;
+}
+
+/* Featured Text Section */
+.featured-text {
+  margin-top: 5rem;
+  text-align: center;
+}
+
+.featured-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
+}
+
+.featured-title {
+  font-size: 1.5rem;
+  font-family: Georgia, serif;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.featured-description {
+  color: #6b7280;
+  max-width: 42rem;
+  margin: 0 auto;
+  line-height: 1.75;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+  .collection-content {
+    padding: 1.5rem;
+  }
+  
+  .collection-title {
+    font-size: 1.5rem;
+  }
+  
+  .collection-description {
+    font-size: 0.875rem;
+  }
+}
+</style>
+
+<script>
+// Optional: Add any interactive JavaScript here
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Collections list page loaded');
+});
+</script>
